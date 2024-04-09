@@ -1,15 +1,15 @@
 package fr.hetic;
 
+
+import fr.hetic.Interface.Operation;
+import fr.hetic.factory.OperationFactory;
+
 import java.io.*;
 import java.util.Scanner;
 
 public class Calculateur {
 
     public static void main(String[] args) {
-        if (args.length != 1) {
-            System.out.println("Usage: java Calculateur <chemin_dossier>");
-            return;
-        }
 
         String path = args[0];
 
@@ -56,61 +56,11 @@ public class Calculateur {
     }
 
     public static double calculer(Double num1, Double num2, String operator) {
-        double resultat;
-        switch (operator) {
-            case "+":
-                resultat = num1 + num2;
-                break;
-            case "-":
-                resultat = num1 - num2;
-                break;
-            case "*":
-                resultat = num1 * num2;
-                break;
-            case "/":
-                resultat = num1 / num2;
-                break;
-            default:
-                System.out.println("Opérateur inconnu");
-                return 0;
-        }
 
-        return resultat;
-    }
+        Operation operation = OperationFactory.getOperation(operator);
 
-    public static void calculeFileOp(String path) {
-        try {
-            File file = new File(path);
-            Scanner scanner = new Scanner(file);
-            while (scanner.hasNextLine()) {
-                String line = scanner.nextLine();
-                String[] parts = line.split(" ");
-
-                if (parts.length != 3) {
-                    System.out.println("Ligne mal formée: " + line);
-                    continue;
-                }
-
-                double num1;
-                double num2;
-                try {
-                    num1 = Double.parseDouble(parts[0]);
-                    num2 = Double.parseDouble(parts[1]);
-                } catch (NumberFormatException e) {
-                    System.out.println("Les deux premiers arguments doivent être des nombres: " + line);
-                    continue;
-                }
-                String operator = parts[2];
-
-                double resultat = calculer(num1, num2, operator);
-
-                writeResult("src/fr/hetic/resultat.res", resultat);
-            }
-            scanner.close();
-        } catch (FileNotFoundException e) {
-            System.out.println("Fichier introuvable");
-            e.printStackTrace();
-        }
+        assert operation != null;
+        return operation.calcul(num1, num2);
     }
 
     public static void writeResult(String path, double result) {
