@@ -60,7 +60,7 @@ public class Calculateur {
     }
 
     public static double calculer(Double num1, Double num2, String operator) {
-
+        
         return switch (operator) {
             case "+" -> num1 + num2;
             case "-" -> num1 - num2;
