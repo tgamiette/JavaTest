@@ -22,7 +22,7 @@ public class Calculateur {
         }
     }
 
-    private static void processFile(File fichier) {
+    public static void processFile(File fichier) {
         String nameFile = fichier.getAbsolutePath().replace(".op", ".res");
 
         try (Stream<String> lines = Files.lines(fichier.toPath())) {
@@ -31,7 +31,7 @@ public class Calculateur {
                     String[] elements = line.split(" ");
 
                     if (elements.length != 3) {
-                        throw new Exception("Le fichier " + fichier.getName() + " n'est pas correctement formaté");
+                        throw new IllegalArgumentException("Le fichier " + fichier.getName() + " n'est pas correctement formaté");
                     }
 
                     double num1 = Double.parseDouble(elements[0]);
@@ -54,7 +54,6 @@ public class Calculateur {
     public static double calculer(Double num1, Double num2, String operator) {
         Operation operation = OperationFactory.getOperation(operator);
 
-        assert operation != null;
         return operation.calcul(num1, num2);
     }
 
