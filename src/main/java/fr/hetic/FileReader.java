@@ -6,21 +6,14 @@ import fr.hetic.factory.OperationFactory;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.Stream;
 
-public class Calculateur {
+public class FileReader extends Reader {
     private static final String PATH = "/Users/dev-tgamiette/Documents/GitHub/Hetic/JavaTest/src/main/resources";
-
-    public static void main(String[] args) {
-        try (Stream<Path> paths = Files.walk(Paths.get(PATH)).filter(Files::isRegularFile).filter(path -> path.toString().endsWith(".op"))) {
-            paths.forEach(path -> processFile(path.toFile()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     public static void processFile(File fichier) {
         String nameFile = fichier.getAbsolutePath().replace(".op", ".res");
@@ -33,7 +26,6 @@ public class Calculateur {
                     if (elements.length != 3) {
                         throw new IllegalArgumentException("Le fichier " + fichier.getName() + " n'est pas correctement formaté");
                     }
-
                     double num1 = Double.parseDouble(elements[0]);
                     double num2 = Double.parseDouble(elements[1]);
                     String operator = elements[2];
@@ -41,13 +33,12 @@ public class Calculateur {
                     writeResult(nameFile, result);
                 } catch (Exception e) {
                     System.out.println("Erreur lors du traitement de la ligne : " + line + " dans le fichier " + fichier.getName());
-                    e.printStackTrace();
+//                    e.printStackTrace();
                 }
             });
         } catch (IOException e) {
             System.out.println("Impossible de lire le fichier " + fichier.getName());
-            e.printStackTrace();
-
+//            e.printStackTrace();
         }
     }
 
@@ -66,5 +57,20 @@ public class Calculateur {
             System.out.println("Impossible d'écrire le résultat dans le fichier");
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public int read(char[] cbuf, int off, int len) throws IOException {
+        try (Stream<Path> paths = Files.walk(Paths.get(PATH)).filter(Files::isRegularFile).filter(path -> path.toString().endsWith(".op"))) {
+            paths.forEach(path -> processFile(path.toFile()));
+        } catch (IOException e) {
+            System.out.println("Impossible de lire le répertoire " + PATH);
+//            e.printStackTrace();
+        }
+        return off;
+    }
+
+    @Override
+    public void close() throws IOException {
     }
 }
