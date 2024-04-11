@@ -14,9 +14,8 @@ public class OperationFactory {
                 return new Substraction();
             case "*":
                 return new Multiplication();
-//            case "/":
-//                return new Division();
+            default:
+                throw new IllegalArgumentException("Unexpected value: " + operation);
         }
-        return null;
     }
 }
