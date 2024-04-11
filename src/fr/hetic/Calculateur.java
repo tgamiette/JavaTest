@@ -5,51 +5,34 @@ import fr.hetic.Interface.Operation;
 import fr.hetic.factory.OperationFactory;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Scanner;
+import java.util.stream.Stream;
 
 public class Calculateur {
+    private static final String PATH = "/Users/dev-tgamiette/Documents/GitHub/Hetic/JavaTest/src/Ressource";
 
     public static void main(String[] args) {
-
-        String path = args[0];
-
-        File[] files = new File(path).listFiles();
-
-        if (files == null) {
-            System.out.println("Le dossier spécifié est vide.");
-            return;
-        }
-
-        for (File fichier : files) {
-            if (fichier.isFile() && fichier.getName().endsWith(".op")) {
-                processFile(fichier);
-            }
+        try (Stream<Path> paths = Files.walk(Paths.get(PATH))
+                .filter(Files::isRegularFile)
+                .filter(path -> path.toString().endsWith(".op"))) {
+            paths.forEach(path -> processFile(path.toFile()));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
     private static void processFile(File fichier) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(fichier))) {
-            String nameFile = fichier.getAbsolutePath().replace(".op", ".res");
-            BufferedWriter writer = new BufferedWriter(new FileWriter(nameFile));
+        String nameFile = fichier.getAbsolutePath().replace(".op", ".res");
 
-            String ligne;
-            while ((ligne = reader.readLine()) != null) {
-                String[] elements = ligne.split(" ");
-                try {
-                    double num1 = Double.parseDouble(elements[0]);
-                    double num2 = Double.parseDouble(elements[1]);
-                    String operateur = elements[2];
-
-                    double resultat = calculer(num1, num2, operateur);
-                    writer.write(String.valueOf(resultat));
-                    writer.newLine();
-                } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
-                    writer.write("N/A");
-                    writer.newLine();
-                }
-            }
-
-            writer.close();
+        try (Stream<String> lines = Files.lines(fichier.toPath())) {
+            lines.forEach(line -> {
+                String[] elements = line.split(" ");
+                double result = calculer(Double.parseDouble(elements[0]), Double.parseDouble(elements[2]), elements[1]);
+                writeResult(nameFile, result);
+            });
         } catch (IOException e) {
             e.printStackTrace();
         }
