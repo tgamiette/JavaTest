@@ -8,6 +8,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
         String readerType = ConfigReader.getProperties("reader.type");
         Reader reader;
+        System.out.println("readerType: ");
 
         if ("FILE".equals(readerType)) {
             reader = new fr.hetic.FileReader();
